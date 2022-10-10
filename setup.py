@@ -6,6 +6,10 @@ from os.path import abspath, dirname, join
 README_MD = open(join(dirname(abspath(__file__)), "README.md")).read()
 
 setup(
+    use_incremental=True,
+    setup_requires=['incremental'],
+    install_requires=['incremental'], # along with any other install dependencies
+
     # The name of your project that we discussed earlier.
     # This name will decide what users will type when they install your package.
     # In my case it will be:
@@ -19,7 +23,7 @@ setup(
     # eg: 1.0.0, 1.0.1, 3.0.2, 5.0-beta, etc.
     # You CANNOT upload two versions of your package with the same version number
     # This field is REQUIRED
-    version="1.0.2",
+    # version="1.0.2",
 
 
     # The packages that constitute your project.
@@ -39,6 +43,9 @@ setup(
     #     'cryptography',
     #     'python-decouple',
     # ],
+
+    # agar file manifest .in dieksekusi
+    include_package_data = True,
 
     # The description that will be shown on PyPI.
     # Keep it short and concise
@@ -64,7 +71,7 @@ setup(
 
     # The author name and email fields are self explanatory.
     # These fields are OPTIONAL
-    author_name="ione03",
+    # author_name="ione03",
     author_email="suratiwan03@gmail.com",
 
     # Classifiers help categorize your project.
