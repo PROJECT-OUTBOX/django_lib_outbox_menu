@@ -1,14 +1,29 @@
 from setuptools import setup, find_packages
 from os.path import abspath, dirname, join
+import codecs
+# import os.path
 
 # Fetches the content from README.md
 # This will be used for the "long_description" field.
 README_MD = open(join(dirname(abspath(__file__)), "README.md")).read()
 
+def read(rel_path):
+    here = abspath(dirname(__file__))
+    with codecs.open(join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith('__version__'):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
+
 setup(
-    use_incremental=True,
-    setup_requires=['incremental'],
-    install_requires=['incremental'], # along with any other install dependencies
+    # use_incremental=True,
+    # setup_requires=['incremental'],
+    # install_requires=['incremental'], # along with any other install dependencies
 
     # The name of your project that we discussed earlier.
     # This name will decide what users will type when they install your package.
@@ -24,7 +39,7 @@ setup(
     # You CANNOT upload two versions of your package with the same version number
     # This field is REQUIRED
     # version="1.0.2",
-
+    version=get_version("menu/_version.py"),
 
     # The packages that constitute your project.
     # For my project, I have only one - "pydash".
