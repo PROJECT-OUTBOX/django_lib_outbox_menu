@@ -10,13 +10,40 @@ README_MD = open(join(dirname(abspath(__file__)), "README.md")).read()
 def read(rel_path):
     here = abspath(dirname(__file__))
     with codecs.open(join(here, rel_path), 'r') as fp:
-        return fp.read()
+        tmp =  fp.read()
+        print('tmp = ', tmp)
+        return tmp
 
 def get_version(rel_path):
     for line in read(rel_path).splitlines():
+        print('line = ', line)
         if line.startswith('__version__'):
-            delim = '"' if '"' in line else "'"
-            return line.split(delim)[1]
+            print('inside if = ', line)
+            delim = line[line.find("(")+1:line.find(")")]
+            print('test1', delim)
+
+            # clear space
+            i = 0
+            tmp = ""
+            while i<len(delim):
+                tmp+=str(delim[i]).strip()
+                i+=1
+
+            print(tmp)
+            # for i in delim:
+            #     delim[i] = i.replace(" ", "")
+
+            delim_split = tmp.split(',')
+            print(delim_split)
+            # delim = '"' if '"' in line else "'"
+            # print('delim = ',delim)
+            # return line.split(delim)[1]
+            delim_split.pop(0)
+            print('res = ', delim_split)
+            
+            tmp = ".".join(delim_split)
+            print('result = ', tmp)
+            return tmp
     else:
         raise RuntimeError("Unable to find version string.")
 
@@ -51,7 +78,7 @@ setup(
     # EITHER py_modules OR packages should be present.
 
     # use array for exclude for better way to exclude package
-    packages=find_packages(exclude=["tests",]),
+    packages=find_packages(exclude=["tests","django_menu",]),
 
     # dependencies
     # install_requires=[
@@ -108,3 +135,7 @@ setup(
 
     
 )
+
+
+# if __name__=="__main__":
+#     get_version("menu/_version.py")

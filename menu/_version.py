@@ -1,11 +1,11 @@
 """
-Provides django_menu version information.
+Provides menu version information.
 """
 
 # This file is auto-generated! Do not edit!
-# Use `python -m incremental.update django_menu` to change this file.
+# Use `python -m incremental.update menu` to change this file.
 
 from incremental import Version
 
-__version__ = Version("menu", 1, 0, 3)
+__version__ = Version("menu", 1, 0, 4)
 __all__ = ["__version__"]
