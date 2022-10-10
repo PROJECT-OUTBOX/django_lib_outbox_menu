@@ -55,7 +55,7 @@ ROOT_URLCONF = 'django_menu.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -137,6 +137,6 @@ SITE_ID = 1
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # sesuai contoh (apa efeknya blm ketahuan, mungkin di server)
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static',
+# ]

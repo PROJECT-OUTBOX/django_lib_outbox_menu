@@ -22,15 +22,10 @@ All you need to do is:
 
 ### Install requirements
     Activate your environment using
-    > mkvirtualenv env_menu
-    > pip install -r requirements.txt
+    > mkvirtualenv env_menu    
 
 ### Migrate to create table to your database
     > python manage.py migrate
-
-### [OPTIONAL] Import default data to table
-    > python manage.py loaddata fixtures/menu.json
-
 
 ## In your django Templates
 
