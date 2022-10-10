@@ -1,3 +1,16 @@
+Metadata-Version: 2.1
+Name: django-outbox-menu
+Version: 1.0.1
+Summary: DJANGO OUTBOX MENU
+Home-page: https://github.com/PROJECT-OUTBOX/django_lib_outbox_menu.git
+Author-email: suratiwan03@gmail.com
+Keywords: menu,model base,environment,django
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3 :: Only
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 # DJANGO OUTBOX MENU
 
 Menu is almost use in every web project. 
