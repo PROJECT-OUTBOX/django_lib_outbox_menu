@@ -36,7 +36,7 @@ setup(
     # EITHER py_modules OR packages should be present.
 
     # use array for exclude for better way to exclude package
-    packages=find_packages(exclude=["tests","django_menu"]),
+    packages=find_packages(exclude=["tests",]),
 
     # dependencies
     # install_requires=[
