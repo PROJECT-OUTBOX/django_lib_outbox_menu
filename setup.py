@@ -133,9 +133,7 @@ setup(
     keywords="menu, model base, environment, django",
 
     # For additional fields, check:
-    # https://github.com/pypa/sampleproject/blob/master/setup.py
-
-    
+    # https://github.com/pypa/sampleproject/blob/master/setup.py    
 )
 
 
