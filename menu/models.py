@@ -3,11 +3,12 @@
     29th September 2022
     Grid Software, Inc.
 '''
-from django.contrib.auth import get_user_model
+# from django.contrib.auth.models import User
+# from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.db import models
 
-User = get_user_model()
+# User = get_user_model()
 
 class OptMenuKinds(models.IntegerChoices):
     '''

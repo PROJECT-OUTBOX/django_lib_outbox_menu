@@ -130,7 +130,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # default user
 # you can custom this base on your model user 
 
-AUTH_USER_MODEL = 'auth.User'
+# AUTH_USER_MODEL = 'auth.User'
 # AUTH_USER_MODEL = 'django.contrib.auth.models.User'
 
 SITE_ID = 1

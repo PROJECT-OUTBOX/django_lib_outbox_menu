@@ -123,7 +123,8 @@ setup(
     # https://pypi.org/classifiers
     # This is OPTIONAL
     classifiers=[
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: BSD License",
+        # "License :: OSI Approved :: MIT License",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3 :: Only"
     ],
