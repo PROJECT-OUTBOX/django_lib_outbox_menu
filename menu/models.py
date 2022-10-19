@@ -39,8 +39,12 @@ class MenuGroup(models.Model):
 
         Tidak ada interface, maintenance di halaman admin
     '''
+    # Update 19 Oktober 2022
+    # untuk membedakan menu project 1 dengan yg lain, dengan nama sama
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
     # Tidak boleh ada data kembar di name
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100) # unique=True (Unique together with site)
 
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)    
@@ -53,6 +57,11 @@ class MenuGroup(models.Model):
     
     def __str__(self):
         return self.name
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['site', 'name'], name='unique_site_name')
+        ]
 
 # def company_name_validate(value):
 #     if len(value) < 3:

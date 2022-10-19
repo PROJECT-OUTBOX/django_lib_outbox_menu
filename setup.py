@@ -66,6 +66,8 @@ setup(
     # You CANNOT upload two versions of your package with the same version number
     # This field is REQUIRED
     # version="1.0.2",
+
+    # update version using : python -m incremental.update menu --newversion 1.0.5
     version=get_version("menu/_version.py"),
 
     # The packages that constitute your project.
