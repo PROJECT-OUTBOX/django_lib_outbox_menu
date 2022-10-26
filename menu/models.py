@@ -198,9 +198,10 @@ class MenuCustom(models.Model):
         Custom menu adalah menu yg hanya muncul di site dan menu_group tertentu saja
         tidak muncul di tempat lain
     '''
+    # Menu ini digunakan untuk filter custom menu yg ada di site, exlude menu_group ada di get_menu_custom_list menus.py
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
-    menu_group = models.ForeignKey(MenuGroup, on_delete=models.PROTECT, blank=True, null=True)    
+    menu_group = models.ForeignKey(MenuGroup, on_delete=models.PROTECT) #, blank=True, null=True)    
     menu = models.OneToOneField(Menu, on_delete=models.CASCADE) # One to One Relations to menu
 
     created_at = models.DateTimeField(auto_now_add=True, editable=False)

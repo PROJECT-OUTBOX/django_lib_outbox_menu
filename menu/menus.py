@@ -87,7 +87,7 @@ class Menus:
         for i in menu_custom:
             self.menu_custom_list.append(i['menu_id'])
 
-        print(self.menu_custom_list)
+        # print(self.menu_custom_list)
 
 
     def ignore_circular_parent(self):
@@ -133,7 +133,7 @@ class Menus:
         for i in mData:
             root_menu.append(i['id'])
 
-        print('root_menu', root_menu)
+        # print('root_menu', root_menu)
 
         # 4. begin process recursive menu
         self.create_menu_recursive(root_menu,0)
