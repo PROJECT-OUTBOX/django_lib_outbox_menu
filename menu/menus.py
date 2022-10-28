@@ -89,7 +89,6 @@ class Menus:
 
         # print(self.menu_custom_list)
 
-
     def ignore_circular_parent(self):
         # 0. Sebelum proses menu, update dulu seluruh menu yg id = id parent set id parent = NULL untuk menghindari
         Menu.objects.filter(id=F('parent_id')).update(parent_id=None)    # query pengaman
@@ -244,4 +243,28 @@ class Menus:
                 self.mList_active.insert(0, {'id': i.id, 'name': i.name, 'link': i.link, 'icon': i.icon, 'is_external':i.is_external})
                 self.get_active_menu(parent_id)
         
+    # function ini sama seperti diatas, hanya saja parameter berupa menu name
+    # find dulu id dari menu name, jika di temukan lebih dari satu munculkan warning
+    # data yg sesuai lebih dari satu
+    def get_active_menu_by_name(self, menu_name):
+        #data = Menu.objects.filter()
+        # cari data yg sesuai di self.mList_recursive
+        # tidak perlu baca database lagi
+        self.mList_active.clear()
+        # print('menu_name = ', menu_name)
 
+        for i in self.mList_recursive:
+            # print(i['name'].lower(), menu_name)
+
+            if i['name'].lower() == menu_name.lower():
+                parent_id = i['parent_id']
+                self.mList_active.insert(0, {'id': i['id'], 'name': i['name'], 'link': i['link'], 'icon': i['icon'], 'is_external':i['is_external']})
+
+                # recursive ke get_active_menu BY ID
+                self.get_active_menu(parent_id)
+
+        result_list = []
+        for i in self.mList_active:
+            result_list.append(i['name'])
+
+        return result_list

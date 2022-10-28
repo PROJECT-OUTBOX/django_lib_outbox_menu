@@ -152,3 +152,9 @@ def menu_active(active_menu):
 #     my_menu = global_menu['0']
 #     print('bread  =', my_menu.create_breadCrumb('profile')    )
 #     return my_menu.create_breadCrumb('profile')    
+
+@register.simple_tag    #(takes_context=True) context, 
+def menu_active_by_name(active_menu_name):    
+    my_menu = global_menu['0']  # harus tipe data string    
+    return my_menu.get_active_menu_by_name(active_menu_name)
+    # return my_menu.get_list_active()
