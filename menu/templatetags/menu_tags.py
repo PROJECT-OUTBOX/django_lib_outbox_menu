@@ -153,8 +153,27 @@ def menu_active(active_menu):
 #     print('bread  =', my_menu.create_breadCrumb('profile')    )
 #     return my_menu.create_breadCrumb('profile')    
 
+
+# UPDATE 22 Nop 2022
 @register.simple_tag    #(takes_context=True) context, 
 def menu_active_by_name(active_menu_name):    
+    '''
+        Jika active_menu_name mengandung underscore (_)
+        maka ubah menjadi spasi
+        karena di template jango tidak bisa menerima spasi untuk kondisi ini
+
+        var active_menu = 'company name'
+        {% menu_breadcrumb active_menu as my_active %}
+        template akan error
+        jadi solusinya ubah :
+        var active_menu = 'company_name'
+        proses di dalam fungsi ini ubah under score menjadi spasi
+        kemudian baru bisa di compare dengan menu real.lowercase()
+    '''
+
+    # Update 22 Nop 22 :
+    # tambahan .replace('_','')
+    # replace underscore dengan spasi
     my_menu = global_menu['0']  # harus tipe data string    
-    return my_menu.get_active_menu_by_name(active_menu_name)
+    return my_menu.get_active_menu_by_name(active_menu_name.replace('_',' '))
     # return my_menu.get_list_active()

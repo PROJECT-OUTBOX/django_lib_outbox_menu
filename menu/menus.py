@@ -43,7 +43,6 @@
 #  --------------------------------------------------------------------------------------------------          
 
 from django.db.models import F
-
 from .models import Menu, MenuCustom
 
 
@@ -55,13 +54,22 @@ class Menus:
     # mDict = {}     
     # mList = []      # result ada di mList
     site_id = 1
+    lang = 'id'
 
-    # defailt menu_group = 0 artinya front end
+    # defailt menu_group = 0 artinya all
+    # kinds = 1 Front end
+    # kinds =2 backend
+    # kinds =0 all
     def __init__(self, menu_group = 0, kinds = 0, site_id = 1): #, pIs_master_menu = False):         # menu_group adalah filter untuk company tertentu saja
         '''
             Jika pKind = 0 maka ambil data semua, frontend dan backend
         '''
         self.site_id = site_id
+
+        # get active language
+        obj = Menu()
+        self.lang = obj.get_current_language()
+
         if len(self.mList_recursive) == 0:
             #if menu_group != "":
             self.create_menus(menu_group, kinds) #, pIs_master_menu)
@@ -103,18 +111,21 @@ class Menus:
         # [UPDATE] tetap digunakan untuk antisipasi root menu digunakan sebagai custom menu
         self.get_menu_custom_list(menu_group)
 
+        # get active language
+        
+
         # 2. Get data by user options (UPDATE only get ROOT MENU base on User OPTION)
         # Harus konversi ke integer karena tidak masuk ke kondisi        
         if int(kinds) == 0: # jika kind = 0 ambil semua data front end dan back end            
-            mData = Menu.objects.filter(menu_group__id=menu_group, is_visibled=True, parent=None) \
+            mData = Menu.objects.language(self.lang).filter(menu_group__id=menu_group, is_visibled=True, parent=None) \
                 .exclude(id__in=self.menu_custom_list) \
                 .order_by('parent_id','order_menu').values('id')     
         elif int(menu_group) == 0:   # menu group = 0 artinya menu frontend            
-            mData = Menu.objects.filter(kind=kinds, is_visibled=True, parent=None) \
+            mData = Menu.objects.language(self.lang).filter(kind=kinds, is_visibled=True, parent=None) \
                 .exclude(id__in=self.menu_custom_list) \
                 .order_by('parent_id','order_menu').values('id')     
         else:            
-            mData = Menu.objects.filter(menu_group__id=menu_group, kind=kinds, is_visibled=True, parent=None) \
+            mData = Menu.objects.language(self.lang).filter(menu_group__id=menu_group, kind=kinds, is_visibled=True, parent=None) \
                 .exclude(id__in=self.menu_custom_list) \
                 .order_by('parent_id','order_menu').values('id')                  
 
@@ -147,10 +158,15 @@ class Menus:
         #return self.get_menus()
 
     def get_menus_complete(self):
+        # obj = Menu()
+        # lang = obj.get_current_language()
+
         mCount = 0
         while mCount < len(self.mList_recursive):
-            mData = Menu.objects.get(id=self.mList_recursive[mCount]['id'])
+            mData = Menu.objects.language(self.lang).get(id=self.mList_recursive[mCount]['id'])
             # print(mData)
+            self.mList_recursive[mCount]['uuid'] = mData.uuid
+            self.mList_recursive[mCount]['order_menu'] = mData.order_menu
             self.mList_recursive[mCount]['name'] = mData.name
             self.mList_recursive[mCount]['link'] = mData.link
             self.mList_recursive[mCount]['icon'] = mData.icon
@@ -172,6 +188,7 @@ class Menus:
             cek apakah ada menu dengan parent = menu_id?
             jika ya return True, else False
         '''
+        # tidak perlu lang disini karena tidak ada field name di ambil
         data = Menu.objects.filter(parent_id=menu_id) \
             .exclude(id__in=self.menu_custom_list) \
             .order_by('parent_id','order_menu').values('id')        
@@ -234,7 +251,7 @@ class Menus:
         '''
             Find active menu recursively
         '''        
-        data = Menu.objects.filter(id=menu_id) \
+        data = Menu.objects.language(self.lang).filter(id=menu_id) \
                 .exclude(id__in=self.menu_custom_list) 
         if data:
             for i in data:

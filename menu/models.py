@@ -7,6 +7,8 @@
 # from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.db import models
+from parler.models import TranslatableModel, TranslatedFields
+import uuid
 
 # User = get_user_model()
 
@@ -28,7 +30,7 @@ class OptMenuKinds(models.IntegerChoices):
                         # untuk itu generate menu default langsung   
 
 
-class MenuGroup(models.Model):
+class MenuGroup(TranslatableModel):
     '''
         Group : Model Menu
         Simpan data group menu :
@@ -43,9 +45,12 @@ class MenuGroup(models.Model):
     # Update 19 Oktober 2022
     # untuk membedakan menu project 1 dengan yg lain, dengan nama sama
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
 
     # Tidak boleh ada data kembar di name
-    name = models.CharField(max_length=100) # unique=True (Unique together with site)
+    translations = TranslatedFields(
+        name = models.CharField(max_length=100) # unique=True (Unique together with site)
+    )
 
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)    
@@ -56,13 +61,14 @@ class MenuGroup(models.Model):
 
     # objects = MenuGroupManager()
     
-    def __str__(self):
+    # def __str__(self):
+    def __unicode__(self):
         return self.name
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['site', 'name'], name='unique_site_name')
-        ]
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(fields=['site', 'translations__name'], name='unique_site_name')
+    #     ]
 
 # def company_name_validate(value):
 #     if len(value) < 3:
@@ -70,7 +76,7 @@ class MenuGroup(models.Model):
 #     else:
 #         return value
 
-class Menu(models.Model):
+class Menu(TranslatableModel):
     '''    
         Relase :
             User --1:N-- Menu
@@ -86,8 +92,12 @@ class Menu(models.Model):
         # Untuk menu di app inventory, user harus login dulu        
         # Jika user telah di create, langsung generate menu untuk user tersebut
         # dapat di visible sesuai kebutuhan
-    '''       
-    name = models.CharField(max_length=100)
+    '''      
+    # ID tetap di create otomaris
+    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False) 
+    translations = TranslatedFields(
+        name = models.CharField(max_length=100)
+    )
 
     # menu group, relasi many to many 
     # Untuk frontend menu group kosong
@@ -177,7 +187,8 @@ class Menu(models.Model):
        # return serializers.serialize("json",' naturalday(self.updated_at)')
         #return serializers.serialize('json', naturalday(self.updated_at))
 
-    def __str__(self):          
+    # def __str__(self):          
+    def __unicode__(self):
         if self.kind == OptMenuKinds.FRONTEND:
             res = '[ Front-End ]'       # halaman depan
         # elif self.kind == OptMenuKinds.BACKEND_DEFAULT:
@@ -195,6 +206,10 @@ class Menu(models.Model):
 
 class MenuCustom(models.Model):
     '''
+        # Akan di hapus di versi berikutnya
+        # status deprecated
+
+        # tidak ada update ke multi language khusus model ini
         Custom menu adalah menu yg hanya muncul di site dan menu_group tertentu saja
         tidak muncul di tempat lain
     '''

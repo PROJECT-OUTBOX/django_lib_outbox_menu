@@ -83,10 +83,9 @@ setup(
     packages=find_packages(exclude=["tests","django_menu",]),
 
     # dependencies
-    # install_requires=[
-    #     'cryptography',
-    #     'python-decouple',
-    # ],
+    install_requires=[
+        'django-parler',        
+    ],
 
     # agar file manifest .in dieksekusi
     include_package_data = True,

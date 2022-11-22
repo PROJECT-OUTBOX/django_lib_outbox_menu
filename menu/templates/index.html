@@ -17,35 +17,37 @@
       <li>{{i}}</li>
     {% endfor %}
     </ul>
+    
+    {% comment %}
+        <hr>
+        DAFTAR AKTIF : (position company)
+        {% menu_active 8 as my_active %}
+        <ul>
+            <li>{{my_active}}</li>
+        </ul>   
+    {% endcomment %}
 
     <hr>
-    DAFTAR AKTIF : (position company)
-    {% menu_active 8 as my_active %}
-    <ul>
-        <li>{{my_active}}</li>
-    </ul>   
-
-    <hr>
-    DAFTAR AKTIF BY NAME : (position company)
-    {% menu_active_by_name 'Grand Son Of What ???' as my_active2 %}
+    DAFTAR AKTIF BY NAME : (position company profil)
+    {% menu_active_by_name 'company_profile' as my_active2 %}
     <ul>
         <li>{{my_active2}}</li>
     </ul>  
     
     {% comment %}
-    {% for i in my_active2 %}
-    <ul>
-        <li>{{i}}</li>
-    </ul>  
-    {% endfor %}
+        {% for i in my_active2 %}
+        <ul>
+            <li>{{i}}</li>
+        </ul>  
+        {% endfor %}
 
-    
-    <hr>
-    Bread Crumb : (position company)
-    {% menu_breadcrumb 'company' as my_active %}
-    <ul>
-        <li>{{my_active}}</li>
-    </ul>       
+        
+        <hr>
+        Bread Crumb : (position company profile)
+        {% menu_breadcrumb 'company_profile' as my_active %}
+        <ul>
+            <li>{{my_active}}</li>
+        </ul>       
     {% endcomment %}
   </body>
 </html>

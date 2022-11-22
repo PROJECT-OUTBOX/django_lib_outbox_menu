@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites', 
     'menu',
+    'parler',   # pip install django-parler
 ]
 
 MIDDLEWARE = [
@@ -108,13 +109,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'id'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Makassar'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_L10N = True
+
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -140,3 +143,25 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'  # sesuai contoh (apa efeknya blm ketahua
 # STATICFILES_DIRS = [
 #     BASE_DIR / 'static',
 # ]
+
+from django.utils.translation import gettext_lazy as _
+
+LANGUAGES = (    
+    ('id', _('Indonesia')),
+    ('en', _('English')),    
+)
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale/',
+]
+
+PARLER_LANGUAGES = {
+    1: (
+        {'code': 'id',}, # English        
+        {'code': 'en',}, # Indonesia        
+    ),
+    'default': {
+        'fallbacks': ['id'],
+        'hide_untranslated': False,
+    }
+} 
