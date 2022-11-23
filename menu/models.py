@@ -62,7 +62,8 @@ class MenuGroup(TranslatableModel):
     # objects = MenuGroupManager()
     
     # def __str__(self):
-    def __unicode__(self):
+    # def __unicode__(self):
+    def __str__(self):
         return self.name
 
     # class Meta:
@@ -188,7 +189,7 @@ class Menu(TranslatableModel):
         #return serializers.serialize('json', naturalday(self.updated_at))
 
     # def __str__(self):          
-    def __unicode__(self):
+    def __str__(self):
         if self.kind == OptMenuKinds.FRONTEND:
             res = '[ Front-End ]'       # halaman depan
         # elif self.kind == OptMenuKinds.BACKEND_DEFAULT:
