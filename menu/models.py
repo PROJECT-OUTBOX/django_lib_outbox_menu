@@ -51,6 +51,9 @@ class MenuGroup(TranslatableModel):
     translations = TranslatedFields(
         name = models.CharField(max_length=100) # unique=True (Unique together with site)
     )
+    
+    # Untuk membedakan mana menu group front end mana yg backend
+    kind = models.SmallIntegerField(choices=OptMenuKinds.choices, default=OptMenuKinds.FRONTEND)
 
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)    
