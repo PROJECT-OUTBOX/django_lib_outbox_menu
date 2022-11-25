@@ -139,11 +139,16 @@ global_menu = {}
 # karena tidak bisa menerima variable di template tag
 @register.simple_tag 
 def menu_create(kind, menugroup):
-    if not global_menu: # var global menu masih kosong
-        my_menu = Menus(menugroup, kind) # 1 = frontend
-        global_menu['0'] = my_menu
-    else:
-        my_menu = global_menu['0']
+    # if not global_menu: # var global menu masih kosong
+    #     my_menu = Menus(menugroup, kind) # 1 = frontend
+    #     global_menu['0'] = my_menu
+    # else:
+    #     my_menu = global_menu['0']
+
+    # Pending update cache, belum disimpan site, dan tgl expired
+    
+    my_menu = Menus(menugroup, kind) # 1 = frontend
+    global_menu['0'] = my_menu
     
     return my_menu.get_menus()
     # return ''
