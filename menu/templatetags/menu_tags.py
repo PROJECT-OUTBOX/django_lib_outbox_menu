@@ -28,99 +28,127 @@ global_menu = {}
 # format:
     # USER_ID, MENU_DATA, User_group, site_ID
     # Ada project_ID (untuk membedakan, project company_profile, acounting, etc)
+# menugroup = MenuGroup.objects.filter(site=self.site_id, kind=1)
+#         if menugroup:
+#             context['menugroup'] = int(menugroup[0].id)
+#             # print('menugroup[0].id = ', menugroup[0].id)
 
+#         else:
+#            raise Http404("Menu Group '%s' belum terdaftar, silahkan daftar di halaman <a href='%s'>admin</a>" % (request.get_host(), '/admin'))
 
 # 2. Create Menu 
-class MenuCreate(template.Node):
-    '''
-        menu_kind :
-            FRONTEND = 1
-            BACKEND = 2 
+# class MenuCreate(template.Node):
+#     '''
+#         menu_kind :
+#             FRONTEND = 1
+#             BACKEND = 2 
 
-        menu_group :
-            jika = 0 maka front end, menu group kosong (ignore untuk mode frontend)
-    '''
-    def __init__(self, menu_kind, menu_group = 0, var_name='menu'):       
-        self.menu_group = menu_group
-        self.menu_kind = menu_kind           
-        self.var_name = var_name
+#         menu_create FRONTEND menugroup as my_menu
 
-    # 1. Cache server
-    #    Cek jika sudah ada data di variable maka tidak perlu ambil lagi di database
-    # def menu_cache():
-    #     lanjut = False
-    #     if global_menu:
-    #         if global_menu[self.menu_group]:
+#         menu_group :
+#             jika = 0 maka front end, menu group kosong (ignore untuk mode frontend)
+#     '''
+#     def __init__(self, menu_kind, menu_group, var_name='menu'):       
+#         self.menu_group = menu_group
+#         self.menu_kind = menu_kind           
+#         self.var_name = var_name
+#         print(menu_group)
+#         # print(request.get_host())
 
-    #     if not global_menu:
-    #         if self.menu_kind == 'FRONTEND':                  
-    #             my_menu = Menus(self.menu_group, 1)
-    #         else:                  
-    #             my_menu = Menus(self.menu_group, 2)
-    #         global_menu[self.menu_group] = my_menu
-    #         print('load from source')
-    #     else:
-    #         if not global_menu[self.menu_group]:
-    #             if self.menu_kind == 'FRONTEND':                  
-    #                 my_menu = Menus(self.menu_group, 1)
-    #             else:                  
-    #                 my_menu = Menus(self.menu_group, 2)
-    #             global_menu[self.menu_group] = my_menu
-    #             print('load from source')
-    #         else:
-    #             my_menu = global_menu[self.menu_group]
-    #             print('load from cache')   
+#     # 1. Cache server
+#     #    Cek jika sudah ada data di variable maka tidak perlu ambil lagi di database
+#     # def menu_cache():
+#     #     lanjut = False
+#     #     if global_menu:
+#     #         if global_menu[self.menu_group]:
 
-    def render(self, context):        
-        # print('group = ', self.menu_group)
-        # print('kinds = ', self.menu_kind)
-        # print('var_name = ', self.var_name)
+#     #     if not global_menu:
+#     #         if self.menu_kind == 'FRONTEND':                  
+#     #             my_menu = Menus(self.menu_group, 1)
+#     #         else:                  
+#     #             my_menu = Menus(self.menu_group, 2)
+#     #         global_menu[self.menu_group] = my_menu
+#     #         print('load from source')
+#     #     else:
+#     #         if not global_menu[self.menu_group]:
+#     #             if self.menu_kind == 'FRONTEND':                  
+#     #                 my_menu = Menus(self.menu_group, 1)
+#     #             else:                  
+#     #                 my_menu = Menus(self.menu_group, 2)
+#     #             global_menu[self.menu_group] = my_menu
+#     #             print('load from source')
+#     #         else:
+#     #             my_menu = global_menu[self.menu_group]
+#     #             print('load from cache')   
+
+#     def render(self, context):        
+#         # print('group = ', self.menu_group)
+#         # print('kinds = ', self.menu_kind)
+#         # print('var_name = ', self.var_name)
         
-        # Parameter di template tidak perlu menggunakan tanda petik untuk menandakan string
+#         # Parameter di template tidak perlu menggunakan tanda petik untuk menandakan string
 
-        # if not global_menu:
-        #     if self.menu_kind == 'FRONTEND':                  
-        #         my_menu = Menus(self.menu_group, 1)
-        #     else:                  
-        #         my_menu = Menus(self.menu_group, 2)
-        #     global_menu[self.menu_group] = my_menu
-        #     print('load from source')
-        # else:
-        #     if not global_menu[self.menu_group]:
-        #         if self.menu_kind == 'FRONTEND':                  
-        #             my_menu = Menus(self.menu_group, 1)
-        #         else:                  
-        #             my_menu = Menus(self.menu_group, 2)
-        #         global_menu[self.menu_group] = my_menu
-        #         print('load from source')
-        #     else:
-        #         my_menu = global_menu[self.menu_group]
-        #         print('load from cache') 
+#         # if not global_menu:
+#         #     if self.menu_kind == 'FRONTEND':                  
+#         #         my_menu = Menus(self.menu_group, 1)
+#         #     else:                  
+#         #         my_menu = Menus(self.menu_group, 2)
+#         #     global_menu[self.menu_group] = my_menu
+#         #     print('load from source')
+#         # else:
+#         #     if not global_menu[self.menu_group]:
+#         #         if self.menu_kind == 'FRONTEND':                  
+#         #             my_menu = Menus(self.menu_group, 1)
+#         #         else:                  
+#         #             my_menu = Menus(self.menu_group, 2)
+#         #         global_menu[self.menu_group] = my_menu
+#         #         print('load from source')
+#         #     else:
+#         #         my_menu = global_menu[self.menu_group]
+#         #         print('load from cache') 
 
-        if self.menu_kind == 'FRONTEND':    
-            # print('oke')
-            my_menu = Menus(self.menu_group, 1)
-        else:
-            my_menu = Menus(self.menu_group, 2)
+#         if self.menu_kind == 'FRONTEND':    
+#             # print('oke')
+#             print('self.menu_group = ', self.menu_group)
+#             my_menu = Menus(self.menu_group, 1)
+#         else:
+#             my_menu = Menus(self.menu_group, 2)
 
+#         global_menu['0'] = my_menu
+#         context[self.var_name] = my_menu.get_menus()
+#         return ''
+
+# @register.tag(name='menu_create')            
+# def get_menu_list(parser, token):
+#     error = False
+#     try :
+#         tag_name, menu_kind, menu_group, _as, var_name = token.split_contents()
+#         print('menu grou p= ', menu_group)
+#         if _as != 'as':
+#             error = True
+#     except:
+#         error = True
+
+#     if error:
+#         raise template.TemplateSyntaxError('menu_create must be of the form, "menu_create <menu_group> <menu_kind> as <var_name>"')
+#     else:
+#         return MenuCreate(menu_kind, menu_group, var_name)    
+
+
+# Gunakan simple tag untuk create menu
+# karena tidak bisa menerima variable di template tag
+@register.simple_tag 
+def menu_create(kind, menugroup):
+    if not global_menu: # var global menu masih kosong
+        my_menu = Menus(menugroup, kind) # 1 = frontend
         global_menu['0'] = my_menu
-        context[self.var_name] = my_menu.get_menus()
-        return ''
-
-@register.tag(name='menu_create')            
-def get_menu_list(parser, token):
-    error = False
-    try :
-        tag_name, menu_kind, menu_group, _as, var_name = token.split_contents()
-        if _as != 'as':
-            error = True
-    except:
-        error = True
-
-    if error:
-        raise template.TemplateSyntaxError('menu_create must be of the form, "menu_create <menu_group> <menu_kind> as <var_name>"')
     else:
-        return MenuCreate(menu_kind, menu_group, var_name)    
+        my_menu = global_menu['0']
+    
+    return my_menu.get_menus()
+    # return ''
+
+
 
 # ------------------------
 # get active mnu
