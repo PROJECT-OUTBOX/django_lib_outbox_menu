@@ -23,7 +23,7 @@ class IndexView(TemplateView):
 
         # Agency ---------------------------------------------
         # agency = get_agency_info(self.site_id)
-        context['menugroup'] = '2'
+        context['menugroup'] = '1'
         return context
 
 class TestMenuView(TemplateView):

@@ -5,6 +5,7 @@
 '''
 # from django.contrib.auth.models import User
 # from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
 from django.contrib.sites.models import Site
 from django.db import models
 from parler.models import TranslatableModel, TranslatedFields
@@ -23,8 +24,9 @@ class OptMenuKinds(models.IntegerChoices):
             0 : Front End
             1 : Back End
     '''
-    FRONTEND = 1
-    BACKEND = 2 
+    FRONTEND = 1, _('Frontend')
+    BACKEND = 2, _('Backend') 
+
     # Tidak jadi karena crash dengan unique together di model
     # BACKEND_DEFAULT = 3 # Penanda user baru login, belum ada company yg aktif, sehingga menu belum bisa di generate
                         # untuk itu generate menu default langsung   
@@ -118,7 +120,9 @@ class Menu(TranslatableModel):
     # jika ada ://www maka dianggap link luar
     # /home/dashboard is not valid URLField (change back to CharField)
     # link = models.URLField(max_length=255, null=True, blank=True)  # , verbose_name='Link'
-    link = models.CharField(max_length=255, null=True, blank=True) 
+
+    # Update 4 Desember 22
+    link = models.CharField(max_length=255, default='#', blank=True)  # Tambah # agar tidan None di link menu # null=True, 
 
     # urut menu
     order_menu = models.SmallIntegerField(default=0)
@@ -150,6 +154,10 @@ class Menu(TranslatableModel):
     # diakses khusus melalui link tertentu di halaman statis   
     # is_statis_menu = models.BooleanField(default=False)	
     is_external = models.BooleanField(default=False)	    # Jika external menu True, maka otomatis target _BLANK
+
+    # Penanda menu baru untuk di dashboard (Input dari halaman secret-admin)
+    # Update 3 Desember 2022
+    is_new = models.BooleanField(default=False)	    
 
     # timestamp
     # created_at = models.DateTimeField(auto_now_add=True)
@@ -199,6 +207,8 @@ class Menu(TranslatableModel):
         #     res = '[ Default ]'
         else:
             res = '[ Back-End ]'        # halaman dashboard
+
+        # res = get_kind_display() # tidak ada selfnya kemungkinan tidak bisa
 
         if self.parent:
             par = self.parent.name      # tampilkan name parent jika ada    

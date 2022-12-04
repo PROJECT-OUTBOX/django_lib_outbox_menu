@@ -171,6 +171,8 @@ class Menus:
             self.mList_recursive[mCount]['link'] = mData.link
             self.mList_recursive[mCount]['icon'] = mData.icon
             self.mList_recursive[mCount]['is_external'] = mData.is_external
+            self.mList_recursive[mCount]['is_visibled'] = mData.is_visibled
+            self.mList_recursive[mCount]['is_new'] = mData.is_new
             self.mList_recursive[mCount]['parent_id'] = mData.parent_id
 
             mCount += 1
@@ -285,3 +287,4 @@ class Menus:
             result_list.append(i['name'])
 
         return result_list
+        
