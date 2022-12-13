@@ -164,7 +164,7 @@ class Menus:
         mCount = 0
         while mCount < len(self.mList_recursive):
             mData = Menu.objects.language(self.lang).get(id=self.mList_recursive[mCount]['id'])
-            # print(mData)
+            # print(mData.order_menu)
             self.mList_recursive[mCount]['uuid'] = mData.uuid
             self.mList_recursive[mCount]['order_menu'] = mData.order_menu
             self.mList_recursive[mCount]['name'] = mData.name
@@ -174,6 +174,8 @@ class Menus:
             self.mList_recursive[mCount]['is_visibled'] = mData.is_visibled
             self.mList_recursive[mCount]['is_new'] = mData.is_new
             self.mList_recursive[mCount]['parent_id'] = mData.parent_id
+            # self.mList_recursive[mCount]['order_menu'] = mData.order_menu
+            
 
             mCount += 1
 

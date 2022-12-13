@@ -10,6 +10,7 @@ from django.contrib.sites.models import Site
 from django.db import models
 from parler.models import TranslatableModel, TranslatedFields
 import uuid
+from django.db.models import Max
 
 # User = get_user_model()
 
@@ -107,7 +108,7 @@ class Menu(TranslatableModel):
 
     # menu group, relasi many to many 
     # Untuk frontend menu group kosong
-    menu_group = models.ManyToManyField(MenuGroup, blank=True) # , null=True, blank=True)  not effect to m2m relation
+    menu_group = models.ManyToManyField(MenuGroup, related_name="menu_group_menu", blank=True) # , null=True, blank=True)  not effect to m2m relation
 
     # Optional Fields:
     # user = models.ForeignKey(User, null=True, blank=True, on_delete=models.PROTECT)        # Menu di generate per user   
@@ -124,7 +125,7 @@ class Menu(TranslatableModel):
     # Update 4 Desember 22
     link = models.CharField(max_length=255, default='#', blank=True)  # Tambah # agar tidan None di link menu # null=True, 
 
-    # urut menu
+    # urut menu (ambil dari id, tapi user dapat mengubah sendiri ordernya)
     order_menu = models.SmallIntegerField(default=0)
 
     # awesome icon
@@ -216,6 +217,23 @@ class Menu(TranslatableModel):
             par = 'ROOT'
 
         return "{} {} > {}".format(res, par, self.name)  
+
+    # untuk slug
+    def save(self, *args, **kwargs):   
+        # menggunakan ID bisa menyebabkan data overload karena tipe data ID BIGINT
+        if self.order_menu == 0:     
+            #     self.order_menu
+            # print('menu_group = ' , self.menu_group.exists())
+            # print('parent = ' , self.parent_id)
+            # print('kind = ' , self.kind)
+            obj = Menu.objects.filter(parent=self.parent, kind=self.kind).aggregate(max=Max(self.order_menu))
+            if obj:
+                # max = obj['max'] + 1
+                self.order_menu = obj['max'] + 1
+
+        # print(tmp)
+
+        super(Menu, self).save(*args, **kwargs)   
 
 
 class MenuCustom(models.Model):
