@@ -226,10 +226,11 @@ class Menu(TranslatableModel):
             # print('menu_group = ' , self.menu_group.exists())
             # print('parent = ' , self.parent_id)
             # print('kind = ' , self.kind)
-            obj = Menu.objects.filter(parent=self.parent, kind=self.kind).aggregate(max=Max(self.order_menu))
+            obj = Menu.objects.filter(parent=self.parent, kind=self.kind).aggregate(max=Max('order_menu'))
             if obj:
                 # max = obj['max'] + 1
-                self.order_menu = obj['max'] + 1
+                if obj['max']:
+                    self.order_menu = obj['max'] + 1
 
         # print(tmp)
 
