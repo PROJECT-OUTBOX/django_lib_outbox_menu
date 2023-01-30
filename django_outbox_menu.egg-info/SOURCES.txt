@@ -11,6 +11,7 @@ menu/__init__.py
 menu/_version.py
 menu/admin.py
 menu/apps.py
+menu/auto_insert_group.py
 menu/menus.py
 menu/models.py
 menu/tests.py
@@ -19,6 +20,10 @@ menu/views.py
 menu/migrations/0001_initial.py
 menu/migrations/0002_menugroup_kind.py
 menu/migrations/0003_menu_is_new_alter_menu_link.py
+menu/migrations/0004_alter_menu_menu_group.py
+menu/migrations/0005_remove_menugroup_site_menugroup_group_and_more.py
+menu/migrations/0006_alter_menugrouptranslation_unique_together_and_more.py
+menu/migrations/0007_auto_20230130_1141.py
 menu/migrations/__init__.py
 menu/static/css/main.css
 menu/static/fonts/iconic/css/material-design-iconic-font.css

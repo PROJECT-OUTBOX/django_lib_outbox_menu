@@ -75,7 +75,7 @@ class MenuGroup(models.Model):
                             # manager   level 5
                             # operator  level 4
 
-        4. Urutan group backend :
+        4. Urutan group backend (kind=2) :
             9. Super Admin
             8. Developer
             7. Admin
@@ -86,7 +86,7 @@ class MenuGroup(models.Model):
             2. ...
             1. ...
 
-           Urutan group frontend :
+           Urutan group frontend (kind=1):
             3. ...
             2. ...
             1. ...
@@ -326,3 +326,4 @@ class Menu(TranslatableModel):
 
 #     def __str__(self):  
 #         return "{}".format(self.menu)  
+
