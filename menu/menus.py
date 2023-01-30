@@ -43,7 +43,7 @@
 #  --------------------------------------------------------------------------------------------------          
 
 from django.db.models import F
-from .models import Menu, MenuCustom
+from .models import Menu # MenuCustom
 
 
 class Menus:    
@@ -55,6 +55,7 @@ class Menus:
     # mList = []      # result ada di mList
     site_id = 1
     lang = 'id'
+    group_id = 0      # simpan group_id untuk digunakan di recursive
 
     # defailt menu_group = 0 artinya all
     # kinds = 1 Front end
@@ -69,6 +70,7 @@ class Menus:
         # get active language
         obj = Menu()
         self.lang = obj.get_current_language()
+        self.group_id = menu_group
 
         if len(self.mList_recursive) == 0:
             #if menu_group != "":
@@ -85,17 +87,17 @@ class Menus:
     def get_list_active(self):
         return self.mList_active
 
-    def get_menu_custom_list(self, menu_group):
-        # select custom menu for ignoring
-        self.menu_custom_list = []
-        menu_custom = list(MenuCustom.objects.filter(site_id=self.site_id). \
-            exclude(menu_group_id=menu_group).values('menu_id'))
-        # print(menu_custom)
+    # def get_menu_custom_list(self, menu_group):
+    #     # select custom menu for ignoring
+    #     self.menu_custom_list = []
+    #     menu_custom = list(MenuCustom.objects.filter(site_id=self.site_id). \
+    #         exclude(menu_group_id=menu_group).values('menu_id'))
+    #     # print(menu_custom)
 
-        for i in menu_custom:
-            self.menu_custom_list.append(i['menu_id'])
+    #     for i in menu_custom:
+    #         self.menu_custom_list.append(i['menu_id'])
 
-        # print(self.menu_custom_list)
+    #     # print(self.menu_custom_list)
 
     def ignore_circular_parent(self):
         # 0. Sebelum proses menu, update dulu seluruh menu yg id = id parent set id parent = NULL untuk menghindari
@@ -109,24 +111,37 @@ class Menus:
        
         # exclude custom menu tidak digunakan disini karena hanya di ambil root menu saja
         # [UPDATE] tetap digunakan untuk antisipasi root menu digunakan sebagai custom menu
-        self.get_menu_custom_list(menu_group)
+        # self.get_menu_custom_list(menu_group)
 
         # get active language
         
-
         # 2. Get data by user options (UPDATE only get ROOT MENU base on User OPTION)
         # Harus konversi ke integer karena tidak masuk ke kondisi        
         if int(kinds) == 0: # jika kind = 0 ambil semua data front end dan back end            
-            mData = Menu.objects.language(self.lang).filter(menu_group__id=menu_group, is_visibled=True, parent=None) \
-                .exclude(id__in=self.menu_custom_list) \
+            # .exclude(id__in=self.menu_custom_list) \
+            # UPADATE menu_group__id menjadi menu_group__group_id
+            mData = Menu.objects.language(self.lang).filter(menu_group__group_id=menu_group \
+                ,is_visibled=True, parent=None) \
                 .order_by('parent_id','order_menu').values('id')     
-        elif int(menu_group) == 0:   # menu group = 0 artinya menu frontend            
-            mData = Menu.objects.language(self.lang).filter(kind=kinds, is_visibled=True, parent=None) \
-                .exclude(id__in=self.menu_custom_list) \
-                .order_by('parent_id','order_menu').values('id')     
-        else:            
-            mData = Menu.objects.language(self.lang).filter(menu_group__id=menu_group, kind=kinds, is_visibled=True, parent=None) \
-                .exclude(id__in=self.menu_custom_list) \
+        # elif int(menu_group) == 0:   # menu group = 0 artinya menu frontend            
+        #     # .exclude(id__in=self.menu_custom_list) \
+        #     mData = Menu.objects.language(self.lang).filter(kind=kinds, is_visibled=True, parent=None) \
+        #         .order_by('parent_id','order_menu').values('id')     
+
+        # !!!!!!! UPDATE !!!!!!!
+        # ----------------------
+        # Update 30 januari 2023, Frontend juga harus jelas menugroup milik frontend (Annonymous)
+        # kondisi ambil semua yg bertipe front end tidak ada lagi
+        # karena front end juga bisa berbeda susunan menunya tergantung user yg lagi aktif (default annonymous)
+
+        # kondisi is_visible dan menu_group_id di perlukan untuk cek apakah menu root visible dan benar milik user yg aktif
+        # kondisi ini juga perlu di cek di recursive create menu, untuk mendeteksi sub menu is_visible dan milik user aktif atau bukan
+        # ---------------------
+
+        else:   
+            # .exclude(id__in=self.menu_custom_list) \         
+            mData = Menu.objects.language(self.lang).filter(menu_group__group_id=menu_group \
+                ,kind=kinds, is_visibled=True, parent=None) \
                 .order_by('parent_id','order_menu').values('id')                  
 
         # .exclude(id__in=menu_custom_list) \
@@ -142,6 +157,8 @@ class Menus:
         root_menu = []
         for i in mData:
             root_menu.append(i['id'])
+
+        print('root_menu=', root_menu)
 
         # print('root_menu', root_menu)
 
@@ -193,8 +210,10 @@ class Menus:
             jika ya return True, else False
         '''
         # tidak perlu lang disini karena tidak ada field name di ambil
-        data = Menu.objects.filter(parent_id=menu_id) \
-            .exclude(id__in=self.menu_custom_list) \
+        # .exclude(id__in=self.menu_custom_list) \
+        data = Menu.objects.filter(parent_id=menu_id \
+            ,menu_group__group_id=self.group_id \
+            ,is_visibled=True) \
             .order_by('parent_id','order_menu').values('id')        
         ret = []
         for i in data:
@@ -255,8 +274,8 @@ class Menus:
         '''
             Find active menu recursively
         '''        
-        data = Menu.objects.language(self.lang).filter(id=menu_id) \
-                .exclude(id__in=self.menu_custom_list) 
+        data = Menu.objects.language(self.lang).filter(id=menu_id)
+                # .exclude(id__in=self.menu_custom_list) 
         if data:
             for i in data:
                 # print(i.parent_id)

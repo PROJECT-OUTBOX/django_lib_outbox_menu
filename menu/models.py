@@ -3,14 +3,16 @@
     29th September 2022
     Grid Software, Inc.
 '''
+import uuid
+
+from django.contrib.auth.models import Group
+from django.contrib.sites.models import Site
+from django.db import models
+from django.db.models import Max
 # from django.contrib.auth.models import User
 # from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
-from django.contrib.sites.models import Site
-from django.db import models
 from parler.models import TranslatableModel, TranslatedFields
-import uuid
-from django.db.models import Max
 
 # User = get_user_model()
 
@@ -32,8 +34,7 @@ class OptMenuKinds(models.IntegerChoices):
     # BACKEND_DEFAULT = 3 # Penanda user baru login, belum ada company yg aktif, sehingga menu belum bisa di generate
                         # untuk itu generate menu default langsung   
 
-
-class MenuGroup(TranslatableModel):
+class MenuGroup(models.Model):
     '''
         Group : Model Menu
         Simpan data group menu :
@@ -44,16 +45,74 @@ class MenuGroup(TranslatableModel):
         5. dll...
 
         Tidak ada interface, maintenance di halaman admin
+
+
+        # Perubahan proses bisnis :
+        --------------------------
+
+        1. MenuGrup ini berelasi OneToOne ke tabel auth group django
+        agar supaya permission mengikuti setting default django
+
+        2. Site tetap dipertahankan, karena setiap site memiliki struktur group yang sama
+        tidak ada akses untuk client mengubah struktur group ini
+        Jika site kosong itu artinya group menu milik semua site
+
+        2.a name dihapus karena sudah ada di auth group django
+        2.b menu customs di hapus karena menu custom dapat langsung di create di menu utama
+
+        3. Struktur group default adalah :
+            # admin (superuser), akses melalui secret-admin (hanya dimiliki oleh owner code)
+                security level 10
+                # akun developer, akses melalui dashboard (ada menu khusus yg hanya muncul di group ini)
+                    security level 9
+                    # akun client (admin-client), akses melalui dashboard, memiliki akses untuk untuk membuat sub user di bawah client
+                        security level 8
+                        # akun operator-client, memiliki akses untuk membuka menu tertentu saja
+                        security level 7
+                        client dapat berkreasi membuat nama operator-client ini
+                        nama default yg telah ada di database :
+                            # owner     level 6
+                            # manager   level 5
+                            # operator  level 4
+
+        4. Urutan group backend :
+            9. Super Admin
+            8. Developer
+            7. Admin
+            6. Owner
+            5. Manager
+            4. Operator
+            3. ...
+            2. ...
+            1. ...
+
+           Urutan group frontend :
+            3. ...
+            2. ...
+            1. ...
+            0. Anonymous     
+
+            level 1..3 untuk group tertentu misal user telah login, ada menu khusus yg muncul untuk group tsb.
+
+        5. id yang digunakan adalah id dari auth_group bukan id dari menuGroup
     '''
     # Update 19 Oktober 2022
     # untuk membedakan menu project 1 dengan yg lain, dengan nama sama
-    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
+    # site ada tambahan null true, blank true
+    # jika berisi null, itu artinya milik semua site
+
     uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
 
-    # Tidak boleh ada data kembar di name
-    translations = TranslatedFields(
-        name = models.CharField(max_length=100) # unique=True (Unique together with site)
-    )
+    # additional fields
+    # null true, untuk compatibilitas dengan versi sebelumnya
+    group = models.OneToOneField(Group, on_delete=models.CASCADE, null=True, blank=True)
+    level = models.SmallIntegerField(default=0)     
+
+    # Tidak boleh ada data kembar di name    
+    # translations = TranslatedFields(
+    #     name = models.CharField(max_length=100) # unique=True (Unique together with site)
+    # )
     
     # Untuk membedakan mana menu group front end mana yg backend
     kind = models.SmallIntegerField(choices=OptMenuKinds.choices, default=OptMenuKinds.FRONTEND)
@@ -70,7 +129,13 @@ class MenuGroup(TranslatableModel):
     # def __str__(self):
     # def __unicode__(self):
     def __str__(self):
-        return self.name
+        return self.group.name
+
+    def site_domain(self):
+        return self.site.domain if self.site else 'All'
+
+    # class Meta:
+    #     ordering = ('-level',)
 
     # class Meta:
     #     constraints = [
@@ -200,6 +265,9 @@ class Menu(TranslatableModel):
        # return serializers.serialize("json",' naturalday(self.updated_at)')
         #return serializers.serialize('json', naturalday(self.updated_at))
 
+    # class meta:
+    #     ordering = ('-parent_id', '-order_menu',)
+
     # def __str__(self):          
     def __str__(self):
         if self.kind == OptMenuKinds.FRONTEND:
@@ -216,7 +284,7 @@ class Menu(TranslatableModel):
         else:
             par = 'ROOT'
 
-        return "{} {} > {}".format(res, par, self.name)  
+        return "{} {} > {}".format(res, par, self.name)      
 
     # untuk slug
     def save(self, *args, **kwargs):   
@@ -237,24 +305,24 @@ class Menu(TranslatableModel):
         super(Menu, self).save(*args, **kwargs)   
 
 
-class MenuCustom(models.Model):
-    '''
-        # Akan di hapus di versi berikutnya
-        # status deprecated
+# class MenuCustom(models.Model):
+#     '''
+#         # Akan di hapus di versi berikutnya
+#         # status deprecated
 
-        # tidak ada update ke multi language khusus model ini
-        Custom menu adalah menu yg hanya muncul di site dan menu_group tertentu saja
-        tidak muncul di tempat lain
-    '''
-    # Menu ini digunakan untuk filter custom menu yg ada di site, exlude menu_group ada di get_menu_custom_list menus.py
-    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+#         # tidak ada update ke multi language khusus model ini
+#         Custom menu adalah menu yg hanya muncul di site dan menu_group tertentu saja
+#         tidak muncul di tempat lain
+#     '''
+#     # Menu ini digunakan untuk filter custom menu yg ada di site, exlude menu_group ada di get_menu_custom_list menus.py
+#     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
-    menu_group = models.ForeignKey(MenuGroup, on_delete=models.PROTECT) #, blank=True, null=True)    
-    menu = models.OneToOneField(Menu, on_delete=models.CASCADE) # One to One Relations to menu
+#     menu_group = models.ForeignKey(MenuGroup, on_delete=models.PROTECT) #, blank=True, null=True)    
+#     menu = models.OneToOneField(Menu, on_delete=models.CASCADE) # One to One Relations to menu
 
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    updated_at = models.DateTimeField(auto_now=True, editable=False)    
+#     created_at = models.DateTimeField(auto_now_add=True, editable=False)
+#     updated_at = models.DateTimeField(auto_now=True, editable=False)    
 
 
-    def __str__(self):  
-        return "{}".format(self.menu)  
+#     def __str__(self):  
+#         return "{}".format(self.menu)  

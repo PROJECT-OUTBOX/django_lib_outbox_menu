@@ -16,7 +16,8 @@
 '''
 
 from django import template
-from ..models import Menu
+
+# from ..models import Menu
 from ..menus import Menus
 
 register = template.Library()
