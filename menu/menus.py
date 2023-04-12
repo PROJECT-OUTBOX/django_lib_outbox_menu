@@ -19,38 +19,49 @@
 
     Update v3.0:
         # using recursive function, all result list same as old version
-'''
 
-# Tambah dictionary sesuai data di database, Algoritma :
-# 1. Buat query Order by parent id dan order menu
-# 2. copy data ke mDict record per pecord
-# 3. Append ke mList, sehingga jadinya list of dictionary
-# 4. Atur ulang mList, sehingga urutannya menjadi :
-#    Menu Parent
-#       |--- Menu Anak1
-#       |--- Menu Anak2, dst...
-# 5. Atur Ulang Level, sehingga menjadi :
-#    Dictionary memiliki item baru
-#       1. Level : untuk menentukan kedalaman level menu anak
-#       2. HaveChild : True or False, Untuk penanda apakah menu parent mempunyai anak atau tidak
-#       3. haveChildEndTag : Type Integer, Untuk penanda tag penutup menu anak di buat
-#          Jika level 1, buat satu tag penutup menu anak
-#          Jika level 2, buat dua tag penutup menu anak, dst...
-# 6. Atur active menu
-# Buat function baru untuk Atur BreadCrumb, tambahkan List of Dictionary dengan format 
-#       [{'Nama','href'},{'nama2','href2'}]
-#       Data ini akan di cek di template dengan cara yang sama seperti generate menu
-#  --------------------------------------------------------------------------------------------------          
+    Update 12 April 2023:
+        # Filter menu ada dua:
+            di menu_group dan di model_list, keduanya harus ada, jika salah satu saja, maka menu tidak muncul
+
+    ----------------------------------------------------------------------------------------------------
+
+    # Tambah dictionary sesuai data di database, Algoritma :
+    # 1. Buat query Order by parent id dan order menu
+    # 2. copy data ke mDict record per pecord
+    # 3. Append ke mList, sehingga jadinya list of dictionary
+    # 4. Atur ulang mList, sehingga urutannya menjadi :
+    #    Menu Parent
+    #       |--- Menu Anak1
+    #       |--- Menu Anak2, dst...
+    # 5. Atur Ulang Level, sehingga menjadi :
+    #    Dictionary memiliki item baru
+    #       1. Level : untuk menentukan kedalaman level menu anak
+    #       2. HaveChild : True or False, Untuk penanda apakah menu parent mempunyai anak atau tidak
+    #       3. haveChildEndTag : Type Integer, Untuk penanda tag penutup menu anak di buat
+    #          Jika level 1, buat satu tag penutup menu anak
+    #          Jika level 2, buat dua tag penutup menu anak, dst...
+    # 6. Atur active menu
+    # Buat function baru untuk Atur BreadCrumb, tambahkan List of Dictionary dengan format 
+    #       [{'Nama','href'},{'nama2','href2'}]
+    #       Data ini akan di cek di template dengan cara yang sama seperti generate menu
+    #  --------------------------------------------------------------------------------------------------          
+'''
 
 from django.db.models import F
 from .models import Menu # MenuCustom
 
 
 class Menus:    
+    '''
+        Class Menus
+    '''
     # mLvl_prev = -1   # catat level sebelumnya  
     mList_recursive = []
     mList_active = []
-    menu_custom_list = []   # exclude this menu from default menus
+    # menu_custom_list = []   # exclude this menu from default menus
+    # mlist_model = []
+
     # mDict = {}     
     # mList = []      # result ada di mList
     site_id = 1
@@ -61,11 +72,14 @@ class Menus:
     # kinds = 1 Front end
     # kinds =2 backend
     # kinds =0 all
-    def __init__(self, menu_group = 0, kinds = 0, site_id = 1): #, pIs_master_menu = False):         # menu_group adalah filter untuk company tertentu saja
+    def __init__(self, menu_group = 0, kinds = 0, model_list = []): #, site_id = 1): #, pIs_master_menu = False):         # menu_group adalah filter untuk company tertentu saja
         '''
             Jika pKind = 0 maka ambil data semua, frontend dan backend
+
+            Filter menu ada dua:
+                di menu_group dan di model_list, keduanya harus ada, jika salah satu saja, maka menu tidak muncul
         '''
-        self.site_id = site_id
+        # self.site_id = site_id
 
         # get active language
         obj = Menu()
@@ -74,12 +88,12 @@ class Menus:
 
         if len(self.mList_recursive) == 0:
             #if menu_group != "":
-            self.create_menus(menu_group, kinds) #, pIs_master_menu)
+            self.create_menus(menu_group, kinds, model_list) #, pIs_master_menu)
         else:
             # self.mDict = {}  # clear dulu (karena prosedur init ini sekali dijalankan saat class di buat)
             self.mList_recursive = []
             self.mList_active = []
-            self.create_menus(menu_group, kinds) #, pIs_master_menu)                    
+            self.create_menus(menu_group, kinds, model_list) #, pIs_master_menu)                    
 
     def get_menus(self):
         return self.mList_recursive
@@ -103,7 +117,7 @@ class Menus:
         # 0. Sebelum proses menu, update dulu seluruh menu yg id = id parent set id parent = NULL untuk menghindari
         Menu.objects.filter(id=F('parent_id')).update(parent_id=None)    # query pengaman
 
-    def create_menus(self, menu_group, kinds):     
+    def create_menus(self, menu_group, kinds, model_list):     
         # 0. Sebelum proses menu, update dulu seluruh menu yg id = id parent set id parent = NULL untuk menghindari
         # Menu.objects.filter(id=F('parent_id')).update(parent_id=None)    # query pengaman
         # 1. Clear circular reference (ignore it, or set as None)
@@ -121,6 +135,7 @@ class Menus:
             # .exclude(id__in=self.menu_custom_list) \
             # UPADATE menu_group__id menjadi menu_group__group_id
             mData = Menu.objects.language(self.lang).filter(menu_group__group_id=menu_group \
+                ,id__in = model_list \
                 ,is_visibled=True, parent=None) \
                 .order_by('parent_id','order_menu').values('id')     
         # elif int(menu_group) == 0:   # menu group = 0 artinya menu frontend            
@@ -141,6 +156,7 @@ class Menus:
         else:   
             # .exclude(id__in=self.menu_custom_list) \         
             mData = Menu.objects.language(self.lang).filter(menu_group__group_id=menu_group \
+                ,id__in = model_list \
                 ,kind=kinds, is_visibled=True, parent=None) \
                 .order_by('parent_id','order_menu').values('id')                  
 

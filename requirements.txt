@@ -4,7 +4,7 @@ Automat==20.2.0
 click==8.1.3
 constantly==15.1.0
 Django==4.1.1
-django-outbox-menu==1.0.2
+#django-outbox-menu==1.0.2
 hyperlink==21.0.0
 idna==3.4
 incremental==21.3.0

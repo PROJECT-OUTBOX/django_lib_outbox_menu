@@ -139,7 +139,10 @@ global_menu = {}
 # Gunakan simple tag untuk create menu
 # karena tidak bisa menerima variable di template tag
 @register.simple_tag 
-def menu_create(kind, menugroup):
+def menu_create(kind, menugroup): 
+    ''' 
+        2: backend; 1 Frontend
+    '''
     # if not global_menu: # var global menu masih kosong
     #     my_menu = Menus(menugroup, kind) # 1 = frontend
     #     global_menu['0'] = my_menu

@@ -2,9 +2,11 @@ from .models import MenuGroup
 from django.contrib.auth.models import Group
 
 def create_groups(apps, schema_monitor):
-    # auth_group = apps.get_model('django.contrib.auth', 'Group')
+    '''
+        # auth_group = apps.get_model('django.contrib.auth', 'Group')
+    '''
 
-    # For backend
+    # For backend    
     mlist = [   
                 'Super Admin',  # lvl 9
                 'Developer',    # lvl 8
