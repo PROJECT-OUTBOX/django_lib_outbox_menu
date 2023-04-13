@@ -59,6 +59,8 @@ class Menus:
     # mLvl_prev = -1   # catat level sebelumnya  
     mList_recursive = []
     mList_active = []
+    
+    #mMenu_list = [] # diambil dari parameter di create_menu
     # menu_custom_list = []   # exclude this menu from default menus
     # mlist_model = []
 
@@ -117,12 +119,17 @@ class Menus:
         # 0. Sebelum proses menu, update dulu seluruh menu yg id = id parent set id parent = NULL untuk menghindari
         Menu.objects.filter(id=F('parent_id')).update(parent_id=None)    # query pengaman
 
-    def create_menus(self, menu_group, kinds, model_list):     
+    def create_menus(self, menu_group, kinds, menu_list):     
         # 0. Sebelum proses menu, update dulu seluruh menu yg id = id parent set id parent = NULL untuk menghindari
         # Menu.objects.filter(id=F('parent_id')).update(parent_id=None)    # query pengaman
         # 1. Clear circular reference (ignore it, or set as None)
         self.ignore_circular_parent()
-       
+        #print('menu_group', menu_group)
+        #print('kinds', kinds)
+        #print('menu_list', menu_list)
+        
+        #self.mMenu_list = menu_list
+
         # exclude custom menu tidak digunakan disini karena hanya di ambil root menu saja
         # [UPDATE] tetap digunakan untuk antisipasi root menu digunakan sebagai custom menu
         # self.get_menu_custom_list(menu_group)
@@ -134,10 +141,11 @@ class Menus:
         if int(kinds) == 0: # jika kind = 0 ambil semua data front end dan back end            
             # .exclude(id__in=self.menu_custom_list) \
             # UPADATE menu_group__id menjadi menu_group__group_id
+            # ,id__in = model_list \
             mData = Menu.objects.language(self.lang).filter(menu_group__group_id=menu_group \
-                ,id__in = model_list \
                 ,is_visibled=True, parent=None) \
                 .order_by('parent_id','order_menu').values('id')     
+
         # elif int(menu_group) == 0:   # menu group = 0 artinya menu frontend            
         #     # .exclude(id__in=self.menu_custom_list) \
         #     mData = Menu.objects.language(self.lang).filter(kind=kinds, is_visibled=True, parent=None) \
@@ -156,11 +164,11 @@ class Menus:
         else:   
             # .exclude(id__in=self.menu_custom_list) \         
             mData = Menu.objects.language(self.lang).filter(menu_group__group_id=menu_group \
-                ,id__in = model_list \
                 ,kind=kinds, is_visibled=True, parent=None) \
                 .order_by('parent_id','order_menu').values('id')                  
 
         # .exclude(id__in=menu_custom_list) \
+        #print('mData',mData)
         # 3. Get root menu
         # get menu id only
         # print(mData)
@@ -174,7 +182,7 @@ class Menus:
         for i in mData:
             root_menu.append(i['id'])
 
-        print('root_menu=', root_menu)
+        #print('root_menu=', root_menu)
 
         # print('root_menu', root_menu)
 
@@ -187,15 +195,21 @@ class Menus:
         # 6. get complete data base on mData
         self.get_menus_complete()
 
+        # clean data yg tidak ada di menu_list
+        #print('before',self.mList_recursive)
+        self.get_menus_clean(menu_list)
+        print('after',self.mList_recursive)
+        
         # 6. return result
         #return self.get_menus()
 
     def get_menus_complete(self):
         # obj = Menu()
         # lang = obj.get_current_language()
-
+        
         mCount = 0
         while mCount < len(self.mList_recursive):
+            #if self.mList_recursive[mCount]['id'] in menu_list:
             mData = Menu.objects.language(self.lang).get(id=self.mList_recursive[mCount]['id'])
             # print(mData.order_menu)
             self.mList_recursive[mCount]['uuid'] = mData.uuid
@@ -219,6 +233,20 @@ class Menus:
     #         ret.append(i['id'])
 
     #     return ret
+    
+    def get_menus_clean(self, menu_list):
+        # Clean dengan data menu_list jika data tidak ada di menu_list maka hapus dari mList_recursive
+        
+        # obj = Menu()
+        # lang = obj.get_current_language()
+        #print('menu_list [get_menus_complete]',menu_list)
+        mCount = 0
+        while mCount < len(self.mList_recursive):
+            if self.mList_recursive[mCount]['id'] not in menu_list:
+                self.mList_recursive.pop(mCount)
+            else:
+                mCount += 1
+
 
     def is_have_child(self, menu_id):
         '''

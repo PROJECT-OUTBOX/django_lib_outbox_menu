@@ -61,4 +61,6 @@ menu/templates/admin/parler/edit_inline/tabular_tabs.html
 menu/templatetags/__init__.py
 menu/templatetags/menu_tags.py
 menu/templatetags/__pycache__/__init__.cpython-310.pyc
+menu/templatetags/__pycache__/__init__.cpython-38.pyc
 menu/templatetags/__pycache__/menu_tags.cpython-310.pyc
+menu/templatetags/__pycache__/menu_tags.cpython-38.pyc
