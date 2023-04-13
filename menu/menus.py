@@ -187,7 +187,11 @@ class Menus:
         # print('root_menu', root_menu)
 
         # 4. begin process recursive menu
-        self.create_menu_recursive(root_menu,0)
+        if kinds==2: # khusus backend saja
+            self.create_menu_recursive(root_menu,0,menu_list)
+        else:
+            self.create_menu_recursive(root_menu,0)
+        # print('after',self.mList_recursive)
 
         # 5. Update End Tag
         self.update_end_tag()
@@ -196,9 +200,9 @@ class Menus:
         self.get_menus_complete()
 
         # clean data yg tidak ada di menu_list
-        #print('before',self.mList_recursive)
-        self.get_menus_clean(menu_list)
-        print('after',self.mList_recursive)
+        # print('before',self.mList_recursive)
+        # self.get_menus_clean(menu_list)
+        # print('after',self.mList_recursive)
         
         # 6. return result
         #return self.get_menus()
@@ -234,18 +238,18 @@ class Menus:
 
     #     return ret
     
-    def get_menus_clean(self, menu_list):
-        # Clean dengan data menu_list jika data tidak ada di menu_list maka hapus dari mList_recursive
+    # def get_menus_clean(self, menu_list):
+    #     # Clean dengan data menu_list jika data tidak ada di menu_list maka hapus dari mList_recursive
         
-        # obj = Menu()
-        # lang = obj.get_current_language()
-        #print('menu_list [get_menus_complete]',menu_list)
-        mCount = 0
-        while mCount < len(self.mList_recursive):
-            if self.mList_recursive[mCount]['id'] not in menu_list:
-                self.mList_recursive.pop(mCount)
-            else:
-                mCount += 1
+    #     # obj = Menu()
+    #     # lang = obj.get_current_language()
+    #     #print('menu_list [get_menus_complete]',menu_list)
+    #     mCount = 0
+    #     while mCount < len(self.mList_recursive):
+    #         if self.mList_recursive[mCount]['id'] not in menu_list:
+    #             self.mList_recursive.pop(mCount)
+    #         else:
+    #             mCount += 1
 
 
     def is_have_child(self, menu_id):
@@ -265,7 +269,7 @@ class Menus:
 
         return ret
 
-    def create_menu_recursive(self, root_menu_id, lvl): # , menu_group, kinds):     
+    def create_menu_recursive(self, root_menu_id, lvl, menu_list=[]): # , menu_group, kinds):     
         '''
             menu_group, kinds : untuk mendapatkan kondisi where, data selalu sama
             root_menu_id : berisi ID menu root untuk level 0
@@ -277,12 +281,21 @@ class Menus:
         for i in root_menu_id:
             child_id = self.is_have_child(i)
             if child_id:
-                self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':True})
+                if menu_list:
+                    if i in menu_list:
+                        self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':True})
+                else:
+                    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':True})
+
                 lvl += 1                                    
-                self.create_menu_recursive(child_id, lvl)                
+                self.create_menu_recursive(child_id, lvl, menu_list)                
                 lvl -= 1
             else:
-                self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
+                if menu_list:
+                    if i in menu_list:
+                        self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
+                else:
+                    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
 
     def update_end_tag(self):
         '''
