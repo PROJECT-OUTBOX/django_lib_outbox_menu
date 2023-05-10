@@ -284,8 +284,8 @@ class Menus:
                 if menu_list:
                     if i in menu_list:
                         self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':True})
-                else:
-                    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':True})
+                #else: Jika di menu list setting, masih kosong, maka kembalikan data kosong juga (BUG FOUND)
+                #    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':True})
 
                 lvl += 1                                    
                 self.create_menu_recursive(child_id, lvl, menu_list)                
@@ -294,8 +294,8 @@ class Menus:
                 if menu_list:
                     if i in menu_list:
                         self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
-                else:
-                    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
+                #else: # Jika menu list setting kosong
+                #    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
 
     def update_end_tag(self):
         '''
