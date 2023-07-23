@@ -120,6 +120,9 @@ class Menus:
         Menu.objects.filter(id=F('parent_id')).update(parent_id=None)    # query pengaman
 
     def create_menus(self, menu_group, kinds, menu_list):     
+        if not menu_group:
+            return "menu group is empty"
+
         # 0. Sebelum proses menu, update dulu seluruh menu yg id = id parent set id parent = NULL untuk menghindari
         # Menu.objects.filter(id=F('parent_id')).update(parent_id=None)    # query pengaman
         # 1. Clear circular reference (ignore it, or set as None)
@@ -143,7 +146,7 @@ class Menus:
             # UPADATE menu_group__id menjadi menu_group__group_id
             # ,id__in = model_list \
             mData = Menu.objects.language(self.lang).filter(menu_group__group_id=menu_group \
-                ,is_visibled=True, parent=None) \
+                ,is_visibled=True, parent=None, exclude_menu=False) \
                 .order_by('parent_id','order_menu').values('id')     
 
         # elif int(menu_group) == 0:   # menu group = 0 artinya menu frontend            
@@ -164,7 +167,7 @@ class Menus:
         else:   
             # .exclude(id__in=self.menu_custom_list) \         
             mData = Menu.objects.language(self.lang).filter(menu_group__group_id=menu_group \
-                ,kind=kinds, is_visibled=True, parent=None) \
+                ,kind=kinds, is_visibled=True, parent=None, exclude_menu=False) \
                 .order_by('parent_id','order_menu').values('id')                  
 
         # .exclude(id__in=menu_custom_list) \
@@ -261,7 +264,7 @@ class Menus:
         # .exclude(id__in=self.menu_custom_list) \
         data = Menu.objects.filter(parent_id=menu_id \
             ,menu_group__group_id=self.group_id \
-            ,is_visibled=True) \
+            ,is_visibled=True, exclude_menu=False) \
             .order_by('parent_id','order_menu').values('id')        
         ret = []
         for i in data:

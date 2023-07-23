@@ -9,12 +9,12 @@ from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Max
-# from django.contrib.auth.models import User
-# from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from parler.models import TranslatableModel, TranslatedFields
 
 # User = get_user_model()
+# from django.contrib.auth.models import User
+# from django.contrib.auth import get_user_model
 
 class OptMenuKinds(models.IntegerChoices):
     '''
@@ -233,6 +233,10 @@ class Menu(TranslatableModel):
     # penanda di server lokal apakah sudah di sinkronisasi atau belum
     # yg paling penting tanggal harus valid 
     # is_already_sync = models.BooleanField(default=False)	
+    
+    # checkbox untuk pembeda antara menu yang otomatis di generate dan menu
+    # untuk footer, yang tidak perlu di generate untuk menu header
+    exclude_menu = models.BooleanField(default=False) # false artinya digenerate di menu header
 
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)    
@@ -297,7 +301,8 @@ class Menu(TranslatableModel):
             obj = Menu.objects.filter(parent=self.parent, kind=self.kind).aggregate(max=Max('order_menu'))
             if obj:
                 # max = obj['max'] + 1
-                if obj['max']:
+                #if obj['max']: # kondisi obj['max'] == 0 maka kondisi ini tidak masuk
+                if not obj['max'] is None: 
                     self.order_menu = obj['max'] + 1
 
         # print(tmp)
