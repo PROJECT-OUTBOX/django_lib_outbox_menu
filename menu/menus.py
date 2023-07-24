@@ -138,15 +138,16 @@ class Menus:
         # self.get_menu_custom_list(menu_group)
 
         # get active language
-        
+        # print('FROM menu.menu_group',menu_group)
         # 2. Get data by user options (UPDATE only get ROOT MENU base on User OPTION)
         # Harus konversi ke integer karena tidak masuk ke kondisi        
         if int(kinds) == 0: # jika kind = 0 ambil semua data front end dan back end            
             # .exclude(id__in=self.menu_custom_list) \
             # UPADATE menu_group__id menjadi menu_group__group_id
             # ,id__in = model_list \
-            mData = Menu.objects.language(self.lang).filter(menu_group__group_id=menu_group \
-                ,is_visibled=True, parent=None, exclude_menu=False) \
+            # menu_group__group_id=menu_group
+            mData = Menu.objects.language(self.lang).filter(menu_group__id=menu_group \
+                ,is_visibled=True, parent=None) \
                 .order_by('parent_id','order_menu').values('id')     
 
         # elif int(menu_group) == 0:   # menu group = 0 artinya menu frontend            
@@ -166,10 +167,11 @@ class Menus:
 
         else:   
             # .exclude(id__in=self.menu_custom_list) \         
-            mData = Menu.objects.language(self.lang).filter(menu_group__group_id=menu_group \
-                ,kind=kinds, is_visibled=True, parent=None, exclude_menu=False) \
+            mData = Menu.objects.language(self.lang).filter(menu_group__id=menu_group \
+                ,kind=kinds, is_visibled=True, parent=None) \
                 .order_by('parent_id','order_menu').values('id')                  
 
+        # print('mDATA',mData)        
         # .exclude(id__in=menu_custom_list) \
         #print('mData',mData)
         # 3. Get root menu
@@ -185,8 +187,8 @@ class Menus:
         for i in mData:
             root_menu.append(i['id'])
 
-        #print('root_menu=', root_menu)
-
+        # print('root_menu=', root_menu)
+        # print('menu_list=', menu_list)
         # print('root_menu', root_menu)
 
         # 4. begin process recursive menu
@@ -194,7 +196,8 @@ class Menus:
             self.create_menu_recursive(root_menu,0,menu_list)
         else:
             self.create_menu_recursive(root_menu,0)
-        # print('after',self.mList_recursive)
+        
+        # print('MENU.after',self.mList_recursive)
 
         # 5. Update End Tag
         self.update_end_tag()
@@ -226,11 +229,10 @@ class Menus:
             self.mList_recursive[mCount]['icon'] = mData.icon
             self.mList_recursive[mCount]['is_external'] = mData.is_external
             self.mList_recursive[mCount]['is_visibled'] = mData.is_visibled
+            self.mList_recursive[mCount]['exclude_menu'] = mData.exclude_menu
             self.mList_recursive[mCount]['is_new'] = mData.is_new
             self.mList_recursive[mCount]['parent_id'] = mData.parent_id
-            # self.mList_recursive[mCount]['order_menu'] = mData.order_menu
-            
-
+            # self.mList_recursive[mCount]['order_menu'] = mData.order_menu            
             mCount += 1
 
     # def get_root_menu(self, menu_id):
@@ -262,9 +264,10 @@ class Menus:
         '''
         # tidak perlu lang disini karena tidak ada field name di ambil
         # .exclude(id__in=self.menu_custom_list) \
+        # menu_group__group_id
         data = Menu.objects.filter(parent_id=menu_id \
-            ,menu_group__group_id=self.group_id \
-            ,is_visibled=True, exclude_menu=False) \
+            ,menu_group__id=self.group_id \
+            ,is_visibled=True) \
             .order_by('parent_id','order_menu').values('id')        
         ret = []
         for i in data:
@@ -279,14 +282,18 @@ class Menus:
                            berisi ID menu[0] (data satu index saja) untuk level 1..n
                            Hanya berisi ID dengan format ['id_1', 'id_2', 'id_n']
         '''        
-        # print(root_menu_id)
+        # print('root_menu_id',  root_menu_id)
 
         for i in root_menu_id:
             child_id = self.is_have_child(i)
+            # print('is_have_child', child_id)
+            
             if child_id:
                 if menu_list:
                     if i in menu_list:
                         self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':True})
+
+                # MenuList Kosong untuk backend
                 #else: Jika di menu list setting, masih kosong, maka kembalikan data kosong juga (BUG FOUND)
                 #    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':True})
 
@@ -294,11 +301,14 @@ class Menus:
                 self.create_menu_recursive(child_id, lvl, menu_list)                
                 lvl -= 1
             else:
+                # print('menu_list',menu_list)
                 if menu_list:
                     if i in menu_list:
                         self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
-                #else: # Jika menu list setting kosong
-                #    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
+                # Jika menu list setting kosong
+                # MenuList Kosong, untuk front end
+                else: 
+                   self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
 
     def update_end_tag(self):
         '''
