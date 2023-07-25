@@ -17,11 +17,11 @@
 
 from django import template
 
-# from ..models import Menu
 from ..menus import Menus
 
 register = template.Library()
 
+# from ..models import Menu
 # SET GLOBAL VARIABLE FORM MENU
  # cache nanti di template
  # variable global ini bukan untuk cache
@@ -155,20 +155,16 @@ def menu_create(kind, menugroup):
     global_menu['0'] = my_menu
     
     return my_menu.get_menus()
-    # return ''
-
-
-
+    
 # ------------------------
 # get active mnu
-
 # @register.simple_tag(takes_context=True)
 # def menu_active_simple_tag(context, active_menu, menu_group):    
 #     my_menu = global_menu['1']
 #     print('simple tag = ', my_menu.find_activeMenuList(active_menu))
 #     return my_menu.get_menus()
-
 # # OKE pakai simple tag
+
 @register.simple_tag    #(takes_context=True) context, 
 def menu_active(active_menu):    
     my_menu = global_menu['0']  # harus tipe data string    
@@ -214,3 +210,4 @@ def menu_active_by_name(active_menu_name):
     my_menu = global_menu['0']  # harus tipe data string    
     return my_menu.get_active_menu_by_name(active_menu_name.replace('_',' '))
     # return my_menu.get_list_active()
+    

@@ -74,7 +74,7 @@ class Menus:
     # kinds = 1 Front end
     # kinds =2 backend
     # kinds =0 all
-    def __init__(self, menu_group = 0, kinds = 0, model_list = []): #, site_id = 1): #, pIs_master_menu = False):         # menu_group adalah filter untuk company tertentu saja
+    def __init__(self, menu_group = 0, kinds = 0, model_list = [], exclude_menu = -1): #, site_id = 1): #, pIs_master_menu = False):         # menu_group adalah filter untuk company tertentu saja
         '''
             Jika pKind = 0 maka ambil data semua, frontend dan backend
 
@@ -90,12 +90,12 @@ class Menus:
 
         if len(self.mList_recursive) == 0:
             #if menu_group != "":
-            self.create_menus(menu_group, kinds, model_list) #, pIs_master_menu)
+            self.create_menus(menu_group, kinds, model_list, exclude_menu) #, pIs_master_menu)
         else:
             # self.mDict = {}  # clear dulu (karena prosedur init ini sekali dijalankan saat class di buat)
             self.mList_recursive = []
             self.mList_active = []
-            self.create_menus(menu_group, kinds, model_list) #, pIs_master_menu)                    
+            self.create_menus(menu_group, kinds, model_list, exclude_menu) #, pIs_master_menu)                    
 
     def get_menus(self):
         return self.mList_recursive
@@ -119,7 +119,13 @@ class Menus:
         # 0. Sebelum proses menu, update dulu seluruh menu yg id = id parent set id parent = NULL untuk menghindari
         Menu.objects.filter(id=F('parent_id')).update(parent_id=None)    # query pengaman
 
-    def create_menus(self, menu_group, kinds, menu_list):     
+    def create_menus(self, menu_group, kinds, menu_list, exclude_menu): 
+        # Update 24 Juli 2022
+        # exluclude_menu :
+        # -1: all
+        # 0 : false    
+        # 1 : true
+        
         if not menu_group:
             return "menu group is empty"
 
@@ -203,7 +209,7 @@ class Menus:
         self.update_end_tag()
 
         # 6. get complete data base on mData
-        self.get_menus_complete()
+        self.get_menus_complete(exclude_menu)
 
         # clean data yg tidak ada di menu_list
         # print('before',self.mList_recursive)
@@ -213,27 +219,46 @@ class Menus:
         # 6. return result
         #return self.get_menus()
 
-    def get_menus_complete(self):
+    def get_menus_complete(self, exclude_menu):
         # obj = Menu()
         # lang = obj.get_current_language()
         
         mCount = 0
+        mFound = False
+
         while mCount < len(self.mList_recursive):
             #if self.mList_recursive[mCount]['id'] in menu_list:
             mData = Menu.objects.language(self.lang).get(id=self.mList_recursive[mCount]['id'])
-            # print(mData.order_menu)
-            self.mList_recursive[mCount]['uuid'] = mData.uuid
-            self.mList_recursive[mCount]['order_menu'] = mData.order_menu
-            self.mList_recursive[mCount]['name'] = mData.name
-            self.mList_recursive[mCount]['link'] = mData.link
-            self.mList_recursive[mCount]['icon'] = mData.icon
-            self.mList_recursive[mCount]['is_external'] = mData.is_external
-            self.mList_recursive[mCount]['is_visibled'] = mData.is_visibled
-            self.mList_recursive[mCount]['exclude_menu'] = mData.exclude_menu
-            self.mList_recursive[mCount]['is_new'] = mData.is_new
-            self.mList_recursive[mCount]['parent_id'] = mData.parent_id
-            # self.mList_recursive[mCount]['order_menu'] = mData.order_menu            
-            mCount += 1
+            
+            mFound = False
+            if exclude_menu == 1: # True (Ambil yg exlude_menu=True saja)
+                if mData.exclude_menu == True:
+                    mFound = True
+            elif exclude_menu == 0: # False (Ambil yg exclude_menu=False saja)
+                if mData.exclude_menu == False:
+                    mFound = True
+            else: # ambil semua
+                mFound = True
+            
+            if mFound:        
+                #print('ADD array')
+                # print(mData.order_menu)
+                self.mList_recursive[mCount]['uuid'] = mData.uuid
+                self.mList_recursive[mCount]['order_menu'] = mData.order_menu
+                self.mList_recursive[mCount]['name'] = mData.name
+                self.mList_recursive[mCount]['link'] = mData.link
+                self.mList_recursive[mCount]['icon'] = mData.icon
+                self.mList_recursive[mCount]['is_external'] = mData.is_external
+                self.mList_recursive[mCount]['is_visibled'] = mData.is_visibled
+                self.mList_recursive[mCount]['exclude_menu'] = mData.exclude_menu
+                self.mList_recursive[mCount]['is_new'] = mData.is_new
+                self.mList_recursive[mCount]['parent_id'] = mData.parent_id
+                # self.mList_recursive[mCount]['order_menu'] = mData.order_menu      
+                
+                mCount += 1
+            else:
+                #print(f'REMOVE array {mCount}')
+                self.mList_recursive.pop(mCount)      # bug found
 
     # def get_root_menu(self, menu_id):
     #     data = Menu.objects.filter(id__in=menu_id, parent=None).values('id')        
@@ -255,7 +280,6 @@ class Menus:
     #             self.mList_recursive.pop(mCount)
     #         else:
     #             mCount += 1
-
 
     def is_have_child(self, menu_id):
         '''
@@ -361,9 +385,10 @@ class Menus:
         # cari data yg sesuai di self.mList_recursive
         # tidak perlu baca database lagi
         self.mList_active.clear()
-        # print('menu_name = ', menu_name)
+        #print('mList_recursive = ', self.mList_recursive)
 
         for i in self.mList_recursive:
+            #print('i',i)
             # print(i['name'].lower(), menu_name)
 
             if i['name'].lower() == menu_name.lower():
@@ -379,3 +404,6 @@ class Menus:
 
         return result_list
         
+
+
+# END OF FILE
