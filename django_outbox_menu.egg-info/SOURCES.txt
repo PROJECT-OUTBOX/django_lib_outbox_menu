@@ -34,6 +34,7 @@ menu/static/fonts/iconic/fonts/Material-Design-Iconic-Font.svg
 menu/static/fonts/iconic/fonts/Material-Design-Iconic-Font.ttf
 menu/static/fonts/iconic/fonts/Material-Design-Iconic-Font.woff
 menu/static/fonts/iconic/fonts/Material-Design-Iconic-Font.woff2
+menu/static/parler/admin/parler_admin.css
 menu/static/vendor/bootstrap/css/bootstrap-grid.css
 menu/static/vendor/bootstrap/css/bootstrap-grid.css.map
 menu/static/vendor/bootstrap/css/bootstrap-grid.min.css

@@ -151,9 +151,9 @@ class Menus:
             # .exclude(id__in=self.menu_custom_list) \
             # UPADATE menu_group__id menjadi menu_group__group_id
             # ,id__in = model_list \
-            # menu_group__group_id=menu_group
+            # menu_group__group_id=menu_group is_visibled=True, 
             mData = Menu.objects.language(self.lang).filter(menu_group__id=menu_group \
-                ,is_visibled=True, parent=None) \
+                ,parent=None) \
                 .order_by('parent_id','order_menu').values('id')     
 
         # elif int(menu_group) == 0:   # menu group = 0 artinya menu frontend            
@@ -172,9 +172,9 @@ class Menus:
         # ---------------------
 
         else:   
-            # .exclude(id__in=self.menu_custom_list) \         
+            # .exclude(id__in=self.menu_custom_list) \         is_visibled=True, 
             mData = Menu.objects.language(self.lang).filter(menu_group__id=menu_group \
-                ,kind=kinds, is_visibled=True, parent=None) \
+                ,kind=kinds, parent=None) \
                 .order_by('parent_id','order_menu').values('id')                  
 
         # print('mDATA',mData)        
@@ -288,11 +288,11 @@ class Menus:
         '''
         # tidak perlu lang disini karena tidak ada field name di ambil
         # .exclude(id__in=self.menu_custom_list) \
-        # menu_group__group_id
+        # menu_group__group_id ,is_visibled=True) \
         data = Menu.objects.filter(parent_id=menu_id \
-            ,menu_group__id=self.group_id \
-            ,is_visibled=True) \
-            .order_by('parent_id','order_menu').values('id')        
+            ,menu_group__id=self.group_id) \
+            .order_by('parent_id','order_menu').values('id')      
+              
         ret = []
         for i in data:
             ret.append(i['id'])
