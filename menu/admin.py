@@ -3,14 +3,14 @@ from parler.admin import TranslatableAdmin
 
 from .models import Menu, MenuGroup  # , MenuCustom
 
-class MenuAdmin(admin.ModelAdmin):    
-    list_filter = ('name', 'parent',) 
+class MenuAdmin(TranslatableAdmin):     # admin.ModelAdmin
+    #list_filter = ('name',) 
     list_display = ['name', 'parent', 'link', 'order_menu', 'kind', 'exclude_menu', 'updated_at']
     search_fields = ('name', 'parent')
     ordering = ('-updated_at',)
 # .order_by('parent_id','order_menu')
 
-admin.site.register(Menu, TranslatableAdmin)
+admin.site.register(Menu, MenuAdmin)
 
 class MenuGroupAdmin(admin.ModelAdmin):
     list_filter = ('kind',) 

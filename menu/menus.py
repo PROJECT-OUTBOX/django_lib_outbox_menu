@@ -49,7 +49,8 @@
 '''
 
 from django.db.models import F
-from .models import Menu # MenuCustom
+
+from .models import Menu  # MenuCustom
 
 
 class Menus:    
@@ -87,6 +88,7 @@ class Menus:
         obj = Menu()
         self.lang = obj.get_current_language()
         self.group_id = menu_group
+        # print('init', menu_group, kinds, model_list, exclude_menu)
 
         if len(self.mList_recursive) == 0:
             #if menu_group != "":
@@ -199,9 +201,9 @@ class Menus:
 
         # 4. begin process recursive menu
         if kinds==2: # khusus backend saja
-            self.create_menu_recursive(root_menu,0,menu_list)
+            self.create_menu_recursive(root_menu,0,menu_list)   # for backend
         else:
-            self.create_menu_recursive(root_menu,0)
+            self.create_menu_recursive(root_menu,0) # for frontend
         
         # print('MENU.after',self.mList_recursive)
 
@@ -309,6 +311,7 @@ class Menus:
         # print('root_menu_id',  root_menu_id)
 
         for i in root_menu_id:
+            # print('recursive', i)
             child_id = self.is_have_child(i)
             # print('is_have_child', child_id)
             
@@ -320,6 +323,9 @@ class Menus:
                 # MenuList Kosong untuk backend
                 #else: Jika di menu list setting, masih kosong, maka kembalikan data kosong juga (BUG FOUND)
                 #    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':True})
+                else: # untuk front end ini
+                    # print('append dulu datanya data', i)
+                    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':True})
 
                 lvl += 1                                    
                 self.create_menu_recursive(child_id, lvl, menu_list)                
@@ -332,7 +338,8 @@ class Menus:
                 # Jika menu list setting kosong
                 # MenuList Kosong, untuk front end
                 else: 
-                   self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
+                    # print('append data', i)
+                    self.mList_recursive.append({'id':i, 'level':lvl, 'haveChild':False})
 
     def update_end_tag(self):
         '''

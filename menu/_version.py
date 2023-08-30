@@ -7,5 +7,5 @@ Provides menu version information.
 
 from incremental import Version
 
-__version__ = Version("menu", 1, 0, 28)
+__version__ = Version("menu", 1, 1, 29)
 __all__ = ["__version__"]
