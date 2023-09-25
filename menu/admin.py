@@ -5,7 +5,7 @@ from .models import Menu, MenuGroup  # , MenuCustom
 
 class MenuAdmin(TranslatableAdmin):     # admin.ModelAdmin
     #list_filter = ('name',) 
-    list_display = ['name', 'parent', 'link', 'order_menu', 'kind', 'exclude_menu', 'updated_at']
+    list_display = ['name', 'parent', 'link', 'order_menu', 'kind', 'exclude_menu', 'is_initial_data', 'updated_at']
     search_fields = ('name', 'parent')
     ordering = ('-updated_at',)
 # .order_by('parent_id','order_menu')

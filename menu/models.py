@@ -238,6 +238,9 @@ class Menu(TranslatableModel):
     # untuk footer, yang tidak perlu di generate untuk menu header
     exclude_menu = models.BooleanField(default=False) # false artinya digenerate di menu header
 
+    # penanda data yg akan di eksport ke site lain
+    is_initial_data = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)    
 
